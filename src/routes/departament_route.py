@@ -5,16 +5,15 @@ departament_bp = Blueprint('departament', __name__)
 
 @departament_bp.route('/departament', methods=['GET'])
 def list_departament():
-    departament = Departament.query.all()
-    departament_list = [{
-        "id": departament.id,
-        "name_departament": departament.name_departament,
-        "employees": departament.employees,
-    } for departament in departament]
-    return jsonify({"departament": departament_list})
+    departments = Departament.query.all()
+    department_list = [{
+        "id": department.id,
+        "name_departament": department.name_departament,
+        "employees": department.employees
+    } for department in departments]
+    return jsonify({"departament": department_list})
 
-
-@departament_bp.route('/departament_create', methods=['POST'])
+@departament_bp.route('/departament', methods=['POST'])
 def create_departament():
     data = request.get_json()
 
@@ -34,11 +33,11 @@ def create_departament():
         return jsonify({"message": "Departament created successfully"}), 201
     
     except Exception as e:
-        db.session.rollback(e)
+        db.session.rollback()
         return jsonify({"error": "An error occurred while creating the departament"}), 500
 
 
-@departament_bp.route('/departament/<int:id>', methods=['PUT'])
+@departament_bp.route('/departament/<int:id>', methods=['PATCH', 'PUT'])
 def update_departament(id):
     data = request.get_json()
 
@@ -47,17 +46,22 @@ def update_departament(id):
         return jsonify({"error": "Departament not found"}), 404
 
     try:
-        if "name_departament" in data:
-            departament.name_departament = data["name_departament"]
-        if "employees" in data:
-            departament.employees = data["employees"]
+        if request.method == 'PATCH':
+            if "name_departament" in data:
+                departament.name_departament = data["name_departament"]
 
-        db.session.commit()
+        elif request.method == 'PUT':
+            if "name_departament" in data:
+                departament.name_departament = data["name_departament"]
+            if "employees" in data:
+                departament.employees = data["employees"]
+
+            db.session.commit()
 
         return jsonify({"message": "Departament updated successfully"}), 200
 
     except Exception as e:
-        db.session.rollback(e)
+        db.session.rollback()
         return jsonify({"error": "An error occurred while updating the departament"}), 500
     
 
@@ -77,5 +81,6 @@ def delete_departament(departament):
 
     except Exception as e:
         
-        db.session.rollback(e)
+        db.session.rollback()
         return jsonify({"error": "An error occurred while deleting the departament"}), 500
+    

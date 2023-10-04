@@ -6,28 +6,29 @@ address_bp = Blueprint('address', __name__)
 @address_bp.route('/address', methods=['GET'])
 def list_all_addresses():
     addresses = Address.query.all()
-    
     address_list = [{
         "id": address.id,
         "public_place": address.public_place,
         "neighborhood": address.neighborhood,
+        "federative_unit_id": address.federative_unit_id,
     } for address in addresses]
     
     return jsonify({"addresses": address_list}), 200
 
 
-@address_bp.route('/address_create', methods=['POST'])
+@address_bp.route('/address', methods=['POST'])
 def create_address():
     data = request.get_json()
 
     required_fields = ["public_place", "neighborhood"]
     if not all(field in data for field in required_fields):
-        return jsonify({"error": "All required fields (public_place, neighborhood) must be provided"}), 400
+        return jsonify({"error": "All required fields (public_place, neighborhood, federative_unit_id) must be provided"}), 400
 
     try:
         new_address = Address(
             public_place=data["public_place"],
-            neighborhood=data["neighborhood"]
+            neighborhood=data["neighborhood"],
+            federative_unit_id=data["federative_unit_id"]
         )
 
         db.session.add(new_address)
@@ -40,7 +41,7 @@ def create_address():
         return jsonify({"error": "An error occurred while creating the address"}), 500
 
 
-@address_bp.route('/address/<int:id>', methods=['PUT'])
+@address_bp.route('/address/<int:id>', methods=['PATCH', 'PUT'])
 def update_address(id):
     data = request.get_json()
 
@@ -49,9 +50,14 @@ def update_address(id):
         return jsonify({"error": "Address not found"}), 404
 
     try:
-        if "public_place" in data:
+        if request.method == 'PATCH':
+            if "public_place" in data:
+                address.public_place = data["public_place"]
+            if "neighborhood" in data:
+                address.neighborhood = data["neighborhood"]
+                
+        elif request.method == 'PUT':
             address.public_place = data["public_place"]
-        if "neighborhood" in data:
             address.neighborhood = data["neighborhood"]
 
         db.session.commit()
@@ -59,7 +65,7 @@ def update_address(id):
         return jsonify({"message": "Address updated successfully"}), 200
 
     except Exception as e:
-        db.session.rollback(e)
+        db.session.rollback()
         return jsonify({"error": "An error occurred while updating the address"}), 500
     
 

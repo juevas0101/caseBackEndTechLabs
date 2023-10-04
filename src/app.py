@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_migrate import Migrate
-from .models import db 
+from .models import db
 from .routes.people_route import people_bp
 from .routes.departament_route import departament_bp
 from .routes.address_route import address_bp
@@ -22,4 +22,4 @@ app.register_blueprint(federative_unit_bp)
 migrate = Migrate(app, db, directory='./src/data/')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

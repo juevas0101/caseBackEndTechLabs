@@ -41,8 +41,8 @@ class Address(db.Model):
 class Telephone(db.Model):
     __tablename__ = 'telephone'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    telephone_number = db.Column(db.String(10), nullable=False, unique=True)
-    telephone_house = db.Column(db.String(100), nullable=False, unique=True)
+    personal_phone = db.Column(db.String(10), nullable=False, unique=True)
+    home_phone = db.Column(db.String(100), nullable=False, unique=True)
     
     people = db.relationship('People', back_populates='telephone')
 

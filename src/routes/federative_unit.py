@@ -32,11 +32,11 @@ def create_federative_unit():
         return jsonify({"message": "FederativeUnit created successfully"}), 201
 
     except Exception as e:
-        db.session.rollback(e)
+        db.session.rollback()
         return jsonify({"error": "An error occurred while creating the FederativeUnit"}), 500
     
 
-@federative_unit_bp.route('/federative_unit/<int:id>', methods=['PUT'])
+@federative_unit_bp.route('/federative_unit/<int:id>', methods=['PATCH','PUT'])
 def update_federative_unit(id):
     data = request.get_json()
 
@@ -45,15 +45,20 @@ def update_federative_unit(id):
         return jsonify({"error": "FederativeUnit not found"}), 404
 
     try:
-        if "name_state" in data:
+        if request.method == 'PATCH':
+
+         if "name_state" in data:
             federative_unit.name_state = data["name_state"]
+        
+        elif request.method == 'PUT':
+             federative_unit.name_state = data["name_state"]
 
         db.session.commit()
-
+         
         return jsonify({"message": "FederativeUnit updated successfully"}), 200
 
     except Exception as e:
-        db.session.rollback(e)
+        db.session.rollback()
         return jsonify({"error": "An error occurred while updating the FederativeUnit"}), 500
     
 
@@ -70,5 +75,5 @@ def delete_federative_unit(id):
         return jsonify({"message": "FederativeUnit deleted successfully"}), 200
 
     except Exception as e:
-        db.session.rollback(e)
+        db.session.rollback()
         return jsonify({"error": "An error occurred while deleting the FederativeUnit"}), 500

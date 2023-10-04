@@ -8,8 +8,8 @@ def list_all_telephones():
     telephones = Telephone.query.all()
     telephone_list = [{
         "id": telephone.id,
-        "telephone_number": telephone.telephone_number,
-        "telephone_house": telephone.telephone_house
+        "personal_phone": telephone.personal_phone,
+        "home_phone": telephone.home_phone
     } for telephone in telephones]
     return jsonify({"telephones": telephone_list})
 
@@ -18,14 +18,14 @@ def list_all_telephones():
 def create_telephone():
     data = request.get_json()
 
-    required_fields = ["telephone_number", "telephone_house"]
+    required_fields = ["personal_phone", "home_phone"]
     if not all(field in data for field in required_fields):
-        return jsonify({"error": "All required fields (telephone_number, telephone_house) must be provided"}), 400
+        return jsonify({"error": "All required fields (personal_phone, home_phone) must be provided"}), 400
 
     try:
         new_telephone = Telephone(
-            telephone_number=data["telephone_number"],
-            telephone_house=data["telephone_house"]
+            personal_phone=data["personal_phone"],
+            home_phone=data["home_phone"]
         )
 
         db.session.add(new_telephone)
@@ -38,7 +38,7 @@ def create_telephone():
         return jsonify({"error": "An error occurred while creating the telephone"}), 500
     
 
-@telephone_bp.route('/telephone/<int:id>', methods=['PUT'])
+@telephone_bp.route('/telephone/<int:id>', methods=['PATCH', 'PUT'])
 def update_telephone(id):
     data = request.get_json()
 
@@ -47,18 +47,25 @@ def update_telephone(id):
         return jsonify({"error": "Telephone not found"}), 404
 
     try:
-        if "telephone_number" in data:
-            telephone.telephone_number = data["telephone_number"]
-        if "telephone_house" in data:
-            telephone.telephone_house = data["telephone_house"]
+        if request.method == 'PATCH':
+            if "personal_phone" in data:
+                telephone.personal_phone = data["personal_phone"]
+            if "home_phone" in data:
+                telephone.home_phone = data["home_phone"]
+        elif request.method == 'PUT':
+            if "personal_phone" in data:
+                telephone.personal_phone = data["personal_phone"]
+            if "home_phone" in data:
+                telephone.home_phone = data["home_phone"]
 
-        db.session.commit()
+            db.session.commit()
 
         return jsonify({"message": "Telephone updated successfully"}), 200
 
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "An error occurred while updating the telephone"}), 500
+
     
 
 @telephone_bp.route('/telephone/<int:telephone>', methods=['DELETE'])
