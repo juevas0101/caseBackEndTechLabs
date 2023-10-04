@@ -65,8 +65,7 @@ def update_telephone(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "An error occurred while updating the telephone"}), 500
-
-    
+        
 
 @telephone_bp.route('/telephone/<int:telephone>', methods=['DELETE'])
 def delete_telephone(telephone):
