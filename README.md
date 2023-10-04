@@ -72,10 +72,14 @@ docker-compose up -d
 4. __Inicaliza o Flask__
 ```
 "Inicialize na raiz do projeto .env já foi definido"
+flask run
 
-Flask db init
-Flask db migrate
-Flask dd upgrade
+flask db init
+flask db migrate
+flask dd upgrade
+
+novamente:
+flask run
 ```
 
 ⭐ __Agora está conectado !__
